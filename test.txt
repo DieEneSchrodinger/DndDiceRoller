@@ -1,0 +1,11 @@
+attacks:12
+modifier:4
+damage:1d6+2 Piering + 2d10 -2 Force + 1d4 Acid
+ac:12
+attack type:N
+
+attacks:12
+modifier:4
+damage:1d4+2 Slashing
+ac:12
+attack type:N
