@@ -157,27 +157,27 @@ void Options::check_opts() {
 
 void Options::help_msg() {
     std::cout << "Usage: dnd_calculator [options] [files...]" << std::endl
-        << std::endl
-        << "Options:" << std::endl
-        << "  --help or -h            Show this help message" << std::endl
-        << "  --damage <dmg>          Specify damage (format: 1d6 + 7 piercing + 1d6 poison)" << std::endl
-        << "  --modifier <mod>        Specify attack modifier value" << std::endl
-        << "  --attack-count <count>  Specify number of attacks" << std::endl
-        << "  --ac <ac>               Specify target's Armor Class" << std::endl
-        << "  --attack-type <type>    Specify attack type (A or a for Advantage, D or d for Disadvantage, N or n for Normal)" << std::endl
-        << "  --crit-range <range>    Specify critical hit range (default is 20)" << std::endl
-        << std::endl
-        << "File format:" << std::endl
-        << "  attacks:<amount of attacks>" << std::endl
-        << "  modifier:<attack modifier>" << std::endl
-        << "  crit range:<crit range>" << std::endl
-        << "  damage:<damage format>" << std::endl
-        << "  ac:<ac>" << std::endl
-        << "  attack type:<A|D|N>" << std::endl
-        << "Above can be repeated infinitely and in any order" << std::endl
-        << "All values except \"crit range, ac and attack type\"  must be present or program will exit" << std::endl
-        << "Seperate blocks must be seperated by a linebreak" << std::endl
-        << std::endl;
+              << std::endl
+              << "Options:" << std::endl
+              << "  --help or -h            Show this help message" << std::endl
+              << "  --damage <dmg>          Specify damage (format: 1d6 + 7 piercing + 1d6 poison)" << std::endl
+              << "  --modifier <mod>        Specify attack modifier value" << std::endl
+              << "  --attack-count <count>  Specify number of attacks" << std::endl
+              << "  --ac <ac>               Specify target's Armor Class" << std::endl
+              << "  --attack-type <type>    Specify attack type (A or a for Advantage, D or d for Disadvantage, N or n for Normal)" << std::endl
+              << "  --crit-range <range>    Specify critical hit range (default is 20)" << std::endl
+              << std::endl
+              << "File formatting:" << std::endl
+              << "  attacks:<amount of attacks>     format: integer greater than 0" << std::endl
+              << "  modifier:<attack modifier>      format: integer" << std::endl
+              << "  crit range:<crit range>         format: integer between 1 and 20" << std::endl
+              << "  damage:<damage format>          format: 1d6 + 7 piercing + 1d6 poison" << std::endl
+              << "  ac:<ac>                         format: integer greater than 0" << std::endl
+              << "  attack type:<attack type>       format: A or a for Advantage, D or d for Disadvantage, N or n for Normal" << std::endl
+              << std::endl
+              << "Above values can be in any order." << std::endl
+              << "All values except \"crit range\", \"ac\" and \"attack type\"  must be present or program will exit." << std::endl
+              << "Seperate blocks must be seperated by a linebreak and there can be an practically infinite amount of blocks" << std::endl;
 }
 
 void Options::set_attack_modifier() {
@@ -299,7 +299,6 @@ void Options::set_attack_type() {
 
 void Options::set_manual() {
     // If no command line arguments or files are provided, prompt the user to enter options manually
-    std::cout << "No arguments or files provided. Enter options manually.\n";
     set_attack_count();
     set_attack_modifier();
     set_attack_type();
