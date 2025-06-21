@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
             // If there was an error parsing the options, print the error message and help message
             std::cerr << "Error: " << e.what() << std::endl;
             options.help_msg();
-            return 1;
+            return EXIT_FAILURE;
         }
     }
     else {
@@ -42,5 +42,5 @@ int main(int argc, char **argv) {
             std::cout << std::endl;
         }
     }
-    return 0;
+    return EXIT_SUCCESS;
 }

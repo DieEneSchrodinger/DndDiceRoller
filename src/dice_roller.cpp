@@ -26,7 +26,7 @@ void DiceRoller::roll(const Options &options) {
     }
     else {
         std::cerr << "Invalid values provided in options." << std::endl;
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 }
 
@@ -116,7 +116,7 @@ void DiceRoller::roll(const std::string &file_name) {
             }
             else {
                 std::cerr << "Invalid values in file: " << file_name << " at attack set: " << attack_num << std::endl;
-                exit(1);
+                exit(EXIT_FAILURE);
             }
             _vals = RollVals{};
             std::cout << std::endl;
@@ -127,7 +127,7 @@ void DiceRoller::roll(const std::string &file_name) {
         }
         catch(const std::invalid_argument &e){
             std::cerr << e.what() << std::endl;
-            exit(1);
+            exit(EXIT_FAILURE);
         }
         
     }
