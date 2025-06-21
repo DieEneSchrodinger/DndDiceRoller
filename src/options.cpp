@@ -13,7 +13,8 @@ void Options::parse(int argc, char **argv) {
         }
         // Check for the --damage option and parse the damage string with _damage_regex
         else if (arg == "--damage") {
-            if (i + 1 <= argc) {
+            if (++i <= argc) {
+                arg = argv[i];
                 auto begin = std::sregex_iterator(arg.begin(), arg.end(), _damage_regex);
                 auto end = std::sregex_iterator();
                 // Match all occurrences of the damage regex in the input string
@@ -31,7 +32,6 @@ void Options::parse(int argc, char **argv) {
                     damage.type = match[4].str();
                     _damages.push_back(damage);
                 }
-                i++;
             }
             else {
                 throw std::invalid_argument("No damage provided after --damage");
@@ -87,10 +87,10 @@ void Options::parse(int argc, char **argv) {
             }
         }
         // Check for the --ac option and parse the armor class value
-        else if (arg == "--armor-class") {
+        else if (arg == "--ac") {
             if (i + 1 <= argc) {
                 try {
-                    _ac = std::stoi(argv[i++]);
+                    _ac = std::stoi(argv[++i]);
                 }
                 catch (const std::invalid_argument &e) {
                     throw std::invalid_argument("Invalid AC value: " + std::string(argv[i]));
@@ -130,7 +130,7 @@ void Options::parse(int argc, char **argv) {
             }
             // If the argument is not a valid file, throw an error
             else {
-                throw std::invalid_argument("File does not exist: " + arg);
+                throw std::invalid_argument("File does not exist: " + arg + ".");
             }
         }
     }
@@ -141,10 +141,10 @@ void Options::parse(int argc, char **argv) {
 void Options::check_opts() {
     // If no files were passed, check if the required options are set
     // _modifier can be 0, so is not checked here
-    if (_opts_files.size() == 0) {
-        if ((_attack_count == 0 || _ac == 0 || _damages.empty()) && !_help) {
-            throw std::invalid_argument("Not enough options were passed to roll the attack(s)");
-        }
+    if (_opts_files.size() == 0 && !_help) {
+        if (_attack_count == 0) throw std::invalid_argument("attack-count wasn\'t passed, can\'t roll attack(s).");
+        else if (_ac == 0) throw std::invalid_argument("ac wasn\'t passed, can\'t roll attack(s).");
+        else if (_damages.empty()) throw std::invalid_argument("damage wasn\'t passed, can\'t roll attack(s).");
     }
     // If files were passed, but other options are not set, set _only_files to true
     else {
@@ -156,7 +156,7 @@ void Options::check_opts() {
 }
 
 void Options::help_msg() {
-    std::cout << "Usage: dnd_calculator [options] [files...]" << std::endl
+    std::cout << "Usage: DndDiceRoller [options] [files...]" << std::endl
               << std::endl
               << "Options:" << std::endl
               << "  --help or -h            Show this help message" << std::endl
