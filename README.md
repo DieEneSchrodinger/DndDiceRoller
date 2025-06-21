@@ -27,9 +27,7 @@ At this point, the program can be run.
 
 ## Current Limitations
 
-Firstly, the program can currently only be compiled on either Clang or gcc.
-
-Secondly, the program currently does not support all types of syntax for dice.<br>
+The program currently does not support all types of syntax for dice.<br>
 Currently supported syntax is for example:
 ```
 1d6+2 Piering + 2d10 -2 Force + 1d4 Acid
