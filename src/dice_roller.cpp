@@ -119,9 +119,17 @@ void DiceRoller::roll(const std::string &file_name) {
                 exit(1);
             }
             _vals = RollVals{};
+            std::cout << std::endl;
             continue;
         }
-        get_values(buf);
+        try{
+            get_values(buf);
+        }
+        catch(const std::invalid_argument &e){
+            std::cerr << e.what() << std::endl;
+            exit(1);
+        }
+        
     }
 }
 
@@ -180,36 +188,42 @@ int DiceRoller::rand(int dice_sides) const {
 void DiceRoller::get_values(const std::string &buf) {
     // Parses the values from the string buffer and sets them in _vals
     if (buf.empty()) {
-        return;
+        throw std::invalid_argument("Empty line got into get_values, binary is corrupted.");
     }
     else if (buf.starts_with("ac:")) {
         std::string ac = buf.substr(3);
         try {
             _vals.ac = std::stoi(ac);
+            if (_vals.ac < 1){
+                throw std::invalid_argument(ac);
+            }
         }
         catch (const std::invalid_argument &e) {
-            std::cerr << "Invalid AC value: " << ac << std::endl;
-            exit(1);
+            throw std::invalid_argument("Invalid AC value: " + ac + "\n");
         }
     }
     else if (buf.starts_with("attacks:")) {
         std::string attacks = buf.substr(8);
         try {
             _vals.attack_num = std::stoi(attacks);
+            if(_vals.attack_num < 1){
+                throw std::invalid_argument(attacks);
+            }
         }
         catch (const std::invalid_argument &e) {
-            std::cerr << "Invalid attack amount value: " << attacks << std::endl;
-            exit(1);
+            throw std::invalid_argument("Invalid attacks value: " + attacks + "\n");
         }
     }
     else if (buf.starts_with("crit range:")) {
         std::string crit_range = buf.substr(11);
         try {
             _vals.crit_range = std::stoi(crit_range);
+            if(_vals.crit_range < 1 || _vals.crit_range > 20){
+                throw std::invalid_argument(crit_range);
+            }
         }
         catch (const std::invalid_argument &e) {
-            std::cerr << "Invalid crit range value: " << crit_range << std::endl;
-            exit(1);
+            throw std::invalid_argument("Invalid crit range value: " + crit_range + "\n");
         }
     }
     else if (buf.starts_with("modifier:")) {
@@ -218,8 +232,7 @@ void DiceRoller::get_values(const std::string &buf) {
             _vals.modifier = std::stoi(modifier);
         }
         catch (const std::invalid_argument &e) {
-            std::cerr << "Invalid modifier value: " << modifier << std::endl;
-            exit(1);
+            throw std::invalid_argument("Invalid modifier value: " + modifier + "\n");
         }
     }
     else if (buf.starts_with("attack type:")) {
@@ -234,8 +247,7 @@ void DiceRoller::get_values(const std::string &buf) {
             _vals.attack_type = NORMAL;
         }
         else {
-            std::cerr << "Invalid attack type: " << attack_type << std::endl;
-            exit(1);
+            throw std::invalid_argument("Invalid attack type value: " + attack_type + "\n");
         }
     }
     else if (buf.starts_with("damage:")) {
@@ -259,8 +271,7 @@ void DiceRoller::get_values(const std::string &buf) {
         }
     }
     else {
-        std::cerr << "Invalid line in file: " << buf << std::endl;
-        exit(1);
+        throw std::invalid_argument("Invalid line in file: " + buf + "\n");
     }
 }
 
