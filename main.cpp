@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
-#include "inc/options.hpp"
-#include "inc/dice_roller.hpp"
+#include "options.hpp"
+#include "dice_roller.hpp"
 
 int main(int argc, char **argv) {
     Options options{};

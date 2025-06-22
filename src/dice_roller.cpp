@@ -4,8 +4,7 @@
 #include <map>
 #include <vector>
 #include <fstream>
-#include "../inc/dice_roller.hpp"
-#include "../inc/options.hpp"
+#include "dice_roller.hpp"
 
 DiceRoller::DiceRoller() {
     std::srand(static_cast<uint>(time(0)));

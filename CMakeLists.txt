@@ -38,6 +38,7 @@ file(GLOB CPP_FILES "src/*.cpp")
 set(EXTRA_SOURCES ${CPP_FILES})
 if (EXTRA_SOURCES)
     add_library(srcs STATIC ${EXTRA_SOURCES})
+    target_include_directories(srcs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc)
     compile_options(srcs)
 endif ()
 

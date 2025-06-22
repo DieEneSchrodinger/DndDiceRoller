@@ -1,42 +1,10 @@
 #ifndef DICE_ROLLER_H
 #define DICE_ROLLER_H
 
-#include "options.hpp"
+#include "structs.hpp"
 #include <vector>
 #include <string>
 #include <regex>
-
-#define D20 20
-#define CRIT 20
-#define CRIT_MISS 1
-#define CRIT_MULTIPLIER 2
-
-/// @brief Struct to hold the values for the current roll
-struct RollVals {
-    int ac{};
-    int attack_count{};
-    int modifier{};
-    AttackType attack_type{ UNSET };
-    int crit_range{ CRIT };
-    std::vector<Damage> damages;
-    bool empty{ true };
-};
-
-/// @brief Enum to represent the type of attack being made.
-enum AttackType {
-    UNSET = -1,
-    NORMAL,
-    ADVANTAGE,
-    DISADVANTAGE
-};
-
-/// @brief Struct to hold the damage type and its associated values.
-struct Damage {
-    std::string type;
-    int dice_count;
-    int dice_sides;
-    int modifier;
-};
 
 /// @brief DiceRoller class for rolling dice based on provided Options class or file input
 class DiceRoller {
@@ -83,6 +51,7 @@ private:
 
     /// @brief Regex for parsing damage strings
     std::regex _damage_regex{ R"((\d+)d(\d+)(?:\s*([+-]\s*\d+))?\s*([a-zA-Z]+))" };
+
     /// @brief Values for the current roll
     RollVals _vals{};
 };

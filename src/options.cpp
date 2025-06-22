@@ -1,4 +1,4 @@
-#include "../inc/options.hpp"
+#include "options.hpp"
 #include <filesystem>
 #include <stdexcept>
 #include <regex>

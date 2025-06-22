@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <regex>
-#include "dice_roller.hpp"
+#include "structs.hpp"
 
 /// @brief Options class to handle command line arguments and user input for D&D attack calculations.
 class Options {
