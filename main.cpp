@@ -30,16 +30,17 @@ int main(int argc, char **argv) {
     DiceRoller roller{};
     // If only_files is false, roll the attack(s) based on the options provided
     if (!options.only_files()) {
-        std::cout << "Rolling dice...\n";
+        std::cout <<std::endl << "Rolling dice..." << std::endl;
         roller.roll(options);
+        std::cout << std::endl;
     }
     // If there are files specified, roll attack(s) with the values in those files
     if (!options.opts_files().empty()) {
         // For each file specified in the options, roll the attack(s) defined in the file
         for (size_t i = 0; i < options.opts_files().size(); i++) {
             std::cout << "Rolling dice of file: " << options.opts_files().at(i) << "..." << std::endl;
-            roller.roll(options.opts_files().at(i));
             std::cout << std::endl;
+            roller.roll(options.opts_files().at(i));
         }
     }
     return EXIT_SUCCESS;
