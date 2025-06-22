@@ -13,6 +13,7 @@ DiceRoller::DiceRoller() {
 void DiceRoller::roll() const {
     std::map<std::string, int> total{};
     // Start rolling attacks based on the values set in _vals
+    std::cout << "Rolling " << _vals.attack_count << " attacks with AC: " << _vals.ac << std::endl;
     for (int i = 0; i < _vals.attack_count; i++) {
         // Roll attack roll based on the attack type
         int roll = 0;
@@ -26,11 +27,14 @@ void DiceRoller::roll() const {
             roll = std::min(rand(D20), rand(D20));
         }
         std::cout << "Attack " << i + 1 << ": ";
-        if (((roll + _vals.modifier) > _vals.ac || roll == CRIT) && roll != CRIT_MISS) {
+        // Check if the roll hits or misses based on the AC and critical hit/miss conditions
+        if (((roll + _vals.modifier) >= _vals.ac || roll == CRIT) && roll != CRIT_MISS) {
             int multiplier{ 1 };
+            // Set the multiplier to 2 if the roll is a critical hit
             if (roll >= _vals.crit_range) {
-                multiplier = 2;
+                multiplier = CRIT_MULTIPLIER;
             }
+            // Calculate the total damage for each damage type
             for (size_t j = 0; j < _vals.damages.size(); j++) {
                 Damage current_damage = _vals.damages.at(j);
                 int attack_damage = (damage(current_damage.dice_count, current_damage.dice_sides) * multiplier) + current_damage.modifier;
@@ -53,6 +57,7 @@ void DiceRoller::roll() const {
             }
             std::cout << std::endl;
         }
+        // Else print that the attack missed
         else {
             std::cout << "Missed";
             if (roll == CRIT_MISS) {
@@ -61,8 +66,9 @@ void DiceRoller::roll() const {
             std::cout << std::endl;
         }
     }
+    // Print the total damage for each damage type
     std::cout << "Total Damage:" << std::endl;
-    for(const auto& [key, value] : total){
+    for (const auto &[key, value] : total) {
         std::cout << value << " " << key << " Damage" << std::endl;
     }
 }
@@ -103,18 +109,18 @@ void DiceRoller::roll(const std::string &file_name) {
             std::cout << std::endl;
             continue;
         }
-        try{
+        try {
             get_values(buf);
         }
-        catch(const std::invalid_argument &e){
+        catch (const std::invalid_argument &e) {
             std::cerr << e.what() << std::endl;
             exit(EXIT_FAILURE);
         }
-        
+
     }
 }
 
-void DiceRoller::set_attack_type(){
+void DiceRoller::set_attack_type() {
     std::cout << "Are the attacks (A)dvantage or (D)isadvantage, leave empty for standard: ";
     while (true) {
         std::string input;
@@ -137,7 +143,7 @@ void DiceRoller::set_attack_type(){
     }
 }
 
-void DiceRoller::set_ac(){
+void DiceRoller::set_ac() {
     std::cout << "What is the AC of the target: ";
     while (true) {
         std::string input;
@@ -179,7 +185,7 @@ void DiceRoller::get_values(const std::string &buf) {
         std::string ac = buf.substr(3);
         try {
             _vals.ac = std::stoi(ac);
-            if (_vals.ac < 1){
+            if (_vals.ac < 1) {
                 throw std::invalid_argument(ac);
             }
         }
@@ -192,7 +198,7 @@ void DiceRoller::get_values(const std::string &buf) {
         std::string attacks = buf.substr(8);
         try {
             _vals.attack_count = std::stoi(attacks);
-            if(_vals.attack_count < 1){
+            if (_vals.attack_count < 1) {
                 throw std::invalid_argument(attacks);
             }
         }
@@ -205,7 +211,7 @@ void DiceRoller::get_values(const std::string &buf) {
         std::string crit_range = buf.substr(11);
         try {
             _vals.crit_range = std::stoi(crit_range);
-            if(_vals.crit_range < 1 || _vals.crit_range > 20){
+            if (_vals.crit_range < 1 || _vals.crit_range > 20) {
                 throw std::invalid_argument(crit_range);
             }
         }

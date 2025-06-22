@@ -303,6 +303,7 @@ void Options::set_attack_type() {
         std::string input;
         std::getline(std::cin, input);
         if (input.empty() || input == "N" || input == "n") {
+            _vals.attack_type = NORMAL;
             break;
         }
         else if (input == "A" || input == "a") {
