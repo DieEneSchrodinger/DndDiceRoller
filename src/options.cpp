@@ -18,9 +18,15 @@ void Options::parse(int argc, char **argv) {
                 auto begin = std::sregex_iterator(arg.begin(), arg.end(), _damage_regex);
                 auto end = std::sregex_iterator();
                 // Match all occurrences of the damage regex in the input string
+                if (begin == end) {
+                    throw std::invalid_argument("Invalid damage format: " + arg);
+                }
                 for (auto j = begin; j != end; j++) {
                     Damage damage;
                     std::smatch match = *j;
+                    if (match.size() < 5) {
+                        throw std::invalid_argument("Invalid damage format: " + arg);
+                    }
                     damage.dice_count = std::stoi(match[1].str());
                     damage.dice_sides = std::stoi(match[2].str());
                     std::string temp = match[3].matched ? match[3].str() : "0";
@@ -75,7 +81,7 @@ void Options::parse(int argc, char **argv) {
                 else if (type == "D" || type == "d") {
                     _vals.attack_type = DISADVANTAGE;
                 }
-                else if (type == "N" || type == "n" || type.empty()) {
+                else if (type == "N" || type == "n") {
                     _vals.attack_type = NORMAL;
                 }
                 else {
@@ -145,6 +151,7 @@ void Options::check_opts() {
         if (_vals.attack_count == 0) throw std::invalid_argument("attack-count wasn\'t passed, can\'t roll attack(s).");
         else if (_vals.ac == 0) throw std::invalid_argument("ac wasn\'t passed, can\'t roll attack(s).");
         else if (_vals.damages.empty()) throw std::invalid_argument("damage wasn\'t passed, can\'t roll attack(s).");
+        else if (_vals.attack_type == UNSET) throw std::invalid_argument("attack type wasn\'t passed, can\'t roll attack(s).");
     }
     // If files were passed, but other options are not set, set _only_files to true
     else {
@@ -202,6 +209,9 @@ void Options::set_attack_count() {
         std::getline(std::cin, input);
         try {
             _vals.attack_count = std::stoi(input);
+            if (_vals.attack_count < 1) {
+                throw std::invalid_argument(input);
+            }
             break;
         }
         catch (const std::invalid_argument &) {
@@ -219,9 +229,15 @@ void Options::set_damages() {
             // Sets the regex to match
             auto begin = std::sregex_iterator(input.begin(), input.end(), _damage_regex);
             auto end = std::sregex_iterator();
+            if( begin == end) {
+                throw std::invalid_argument(input);
+            }
             for (auto i = begin; i != end; i++) {
                 Damage damage;
                 std::smatch match = *i;
+                if (match.size() < 5) {
+                    throw std::invalid_argument(input);
+                }
                 damage.dice_count = std::stoi(match[1].str());
                 damage.dice_sides = std::stoi(match[2].str());
                 std::string temp = match[3].matched ? match[3].str() : "0";
@@ -237,8 +253,7 @@ void Options::set_damages() {
             break;
         }
         catch (const std::exception &e) {
-            std::cerr << "Error: " << e.what() << std::endl;
-            std::cout << "Please enter a valid damage format: ";
+            std::cout << "Invalid input. Please enter a valid damage format: ";
         }
     }
 }
@@ -253,6 +268,9 @@ void Options::set_crit_range() {
         }
         try {
             _vals.crit_range = std::stoi(input);
+            if (_vals.crit_range < 1 || _vals.crit_range > 20) {
+                throw std::invalid_argument(input);
+            }
             break;
         }
         catch (const std::invalid_argument &) {
@@ -268,6 +286,9 @@ void Options::set_ac() {
         std::getline(std::cin, input);
         try {
             _vals.ac = std::stoi(input);
+            if (_vals.ac < 1) {
+                throw std::invalid_argument(input);
+            }
             break;
         }
         catch (const std::invalid_argument &) {
@@ -277,11 +298,11 @@ void Options::set_ac() {
 }
 
 void Options::set_attack_type() {
-    std::cout << "Do the attack(s) have (A)dvantage or (D)isadvantage, leave empty for standard: ";
+    std::cout << "Do the attack(s) have (A)dvantage or (D)isadvantage, (N)ormal, leave empty for standard: ";
     while (true) {
         std::string input;
         std::getline(std::cin, input);
-        if (input.empty()) {
+        if (input.empty() || input == "N" || input == "n") {
             break;
         }
         else if (input == "A" || input == "a") {
@@ -293,7 +314,7 @@ void Options::set_attack_type() {
             break;
         }
         else {
-            std::cout << "Invalid input. Please enter A, D, or leave empty for normal: ";;
+            std::cout << "Invalid input. Please enter A, D, N or leave empty: ";;
         }
     }
 }
