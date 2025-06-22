@@ -30,7 +30,7 @@ void Options::parse(int argc, char **argv) {
                     }
                     damage.modifier = std::stoi(temp);
                     damage.type = match[4].str();
-                    _damages.push_back(damage);
+                    _vals.damages.push_back(damage);
                 }
             }
             else {
@@ -41,7 +41,7 @@ void Options::parse(int argc, char **argv) {
         else if (arg == "--modifier") {
             if (i + 1 <= argc) {
                 try {
-                    _modifier = std::stoi(argv[++i]);
+                    _vals.modifier = std::stoi(argv[++i]);
                 }
                 catch (const std::invalid_argument &e) {
                     throw std::invalid_argument("Invalid modifier value: " + std::string(argv[i]));
@@ -55,7 +55,7 @@ void Options::parse(int argc, char **argv) {
         else if (arg == "--attack-count") {
             if (i + 1 <= argc) {
                 try {
-                    _attack_count = std::stoi(argv[++i]);
+                    _vals.attack_count = std::stoi(argv[++i]);
                 }
                 catch (const std::invalid_argument &e) {
                     throw std::invalid_argument("Invalid modifier value: " + std::string(argv[i]));
@@ -70,13 +70,13 @@ void Options::parse(int argc, char **argv) {
             if (i + 1 <= argc) {
                 std::string type = argv[++i];
                 if (type == "A" || type == "a") {
-                    _attack_type = ADVANTAGE;
+                    _vals.attack_type = ADVANTAGE;
                 }
                 else if (type == "D" || type == "d") {
-                    _attack_type = DISADVANTAGE;
+                    _vals.attack_type = DISADVANTAGE;
                 }
                 else if (type == "N" || type == "n" || type.empty()) {
-                    _attack_type = NORMAL;
+                    _vals.attack_type = NORMAL;
                 }
                 else {
                     throw std::invalid_argument("Invalid attack type: " + type);
@@ -90,7 +90,7 @@ void Options::parse(int argc, char **argv) {
         else if (arg == "--ac") {
             if (i + 1 <= argc) {
                 try {
-                    _ac = std::stoi(argv[++i]);
+                    _vals.ac = std::stoi(argv[++i]);
                 }
                 catch (const std::invalid_argument &e) {
                     throw std::invalid_argument("Invalid AC value: " + std::string(argv[i]));
@@ -104,7 +104,7 @@ void Options::parse(int argc, char **argv) {
         else if (arg == "--crit-range") {
             if (i + 1 <= argc) {
                 try {
-                    _crit_range = std::stoi(argv[++i]);
+                    _vals.crit_range = std::stoi(argv[++i]);
                 }
                 catch (const std::invalid_argument &e) {
                     throw std::invalid_argument("Invalid critical range value: " + std::string(argv[i]));
@@ -142,13 +142,13 @@ void Options::check_opts() {
     // If no files were passed, check if the required options are set
     // _modifier can be 0, so is not checked here
     if (_opts_files.size() == 0 && !_help) {
-        if (_attack_count == 0) throw std::invalid_argument("attack-count wasn\'t passed, can\'t roll attack(s).");
-        else if (_ac == 0) throw std::invalid_argument("ac wasn\'t passed, can\'t roll attack(s).");
-        else if (_damages.empty()) throw std::invalid_argument("damage wasn\'t passed, can\'t roll attack(s).");
+        if (_vals.attack_count == 0) throw std::invalid_argument("attack-count wasn\'t passed, can\'t roll attack(s).");
+        else if (_vals.ac == 0) throw std::invalid_argument("ac wasn\'t passed, can\'t roll attack(s).");
+        else if (_vals.damages.empty()) throw std::invalid_argument("damage wasn\'t passed, can\'t roll attack(s).");
     }
     // If files were passed, but other options are not set, set _only_files to true
     else {
-        if (_attack_count == 0 || _ac == 0 || _damages.empty()) {
+        if (_vals.attack_count == 0 || _vals.ac == 0 || _vals.damages.empty()) {
             _only_files = true;
         }
     }
@@ -186,7 +186,7 @@ void Options::set_attack_modifier() {
         std::string input;
         std::getline(std::cin, input);
         try {
-            _modifier = std::stoi(input);
+            _vals.modifier = std::stoi(input);
             break;
         }
         catch (const std::invalid_argument &) {
@@ -201,7 +201,7 @@ void Options::set_attack_count() {
         std::string input;
         std::getline(std::cin, input);
         try {
-            _attack_count = std::stoi(input);
+            _vals.attack_count = std::stoi(input);
             break;
         }
         catch (const std::invalid_argument &) {
@@ -216,7 +216,7 @@ void Options::set_damages() {
         std::string input;
         std::getline(std::cin, input);
         try {
-            // Sets the regex to matc
+            // Sets the regex to match
             auto begin = std::sregex_iterator(input.begin(), input.end(), _damage_regex);
             auto end = std::sregex_iterator();
             for (auto i = begin; i != end; i++) {
@@ -226,12 +226,13 @@ void Options::set_damages() {
                 damage.dice_sides = std::stoi(match[2].str());
                 std::string temp = match[3].matched ? match[3].str() : "0";
                 size_t idx = temp.find_first_of(" \t\r\n");
+                // If there is a space or tab in the modifier, remove it
                 if (idx != std::string::npos) {
                     temp.erase(temp.find_first_of(" \t\r\n"), 1);
                 }
                 damage.modifier = std::stoi(temp);
                 damage.type = match[4].str();
-                _damages.push_back(damage);
+                _vals.damages.push_back(damage);
             }
             break;
         }
@@ -251,7 +252,7 @@ void Options::set_crit_range() {
             break;
         }
         try {
-            _crit_range = std::stoi(input);
+            _vals.crit_range = std::stoi(input);
             break;
         }
         catch (const std::invalid_argument &) {
@@ -266,7 +267,7 @@ void Options::set_ac() {
         std::string input;
         std::getline(std::cin, input);
         try {
-            _ac = std::stoi(input);
+            _vals.ac = std::stoi(input);
             break;
         }
         catch (const std::invalid_argument &) {
@@ -284,11 +285,11 @@ void Options::set_attack_type() {
             break;
         }
         else if (input == "A" || input == "a") {
-            _attack_type = ADVANTAGE;
+            _vals.attack_type = ADVANTAGE;
             break;
         }
         else if (input == "D" || input == "d") {
-            _attack_type = DISADVANTAGE;
+            _vals.attack_type = DISADVANTAGE;
             break;
         }
         else {

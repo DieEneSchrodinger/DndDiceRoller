@@ -9,16 +9,33 @@
 #define D20 20
 #define CRIT 20
 #define CRIT_MISS 1
+#define CRIT_MULTIPLIER 2
 
 /// @brief Struct to hold the values for the current roll
 struct RollVals {
     int ac{};
-    int attack_num{};
+    int attack_count{};
     int modifier{};
     AttackType attack_type{ UNSET };
-    int crit_range{ 20 };
+    int crit_range{ CRIT };
     std::vector<Damage> damages;
     bool empty{ true };
+};
+
+/// @brief Enum to represent the type of attack being made.
+enum AttackType {
+    UNSET = -1,
+    NORMAL,
+    ADVANTAGE,
+    DISADVANTAGE
+};
+
+/// @brief Struct to hold the damage type and its associated values.
+struct Damage {
+    std::string type;
+    int dice_count;
+    int dice_sides;
+    int modifier;
 };
 
 /// @brief DiceRoller class for rolling dice based on provided Options class or file input
@@ -27,16 +44,16 @@ public:
     /// @brief Constructor for DiceRoller, initializes random seed.
     DiceRoller();
 
-    /// @brief Rolls the dice based on the provided options.
-    /// @param options options class for CLI options
-    void roll(const Options &options);
-    
     /// @brief Rolls the dice based on the values in the file.
     /// @param file_name name of the file to read values from.
     void roll(const std::string &file_name);
 
     /// @brief Rolls the dice based on the values set in the class.
     void roll() const;
+
+    /// @brief Sets the values for the current roll.
+    /// @param vals Values to set for the current roll.
+    void set_vals(const RollVals &vals) { _vals = vals; }
 
 private:
     /// @brief Sets the attack type based on user input.
@@ -64,9 +81,9 @@ private:
     /// @return True if the values are valid, false otherwise.
     bool check_values() const;
 
-    // Regex for parsing damage strings
+    /// @brief Regex for parsing damage strings
     std::regex _damage_regex{ R"((\d+)d(\d+)(?:\s*([+-]\s*\d+))?\s*([a-zA-Z]+))" };
-    // Values for the current roll
+    /// @brief Values for the current roll
     RollVals _vals{};
 };
 

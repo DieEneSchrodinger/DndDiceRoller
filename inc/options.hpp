@@ -4,22 +4,7 @@
 #include <string>
 #include <vector>
 #include <regex>
-
-/// @brief Enum to represent the type of attack being made.
-enum AttackType {
-    UNSET = -1,
-    NORMAL,
-    ADVANTAGE,
-    DISADVANTAGE
-};
-
-/// @brief Struct to hold the damage type and its associated values.
-struct Damage {
-    std::string type;
-    int dice_count;
-    int dice_sides;
-    int modifier;
-};
+#include "dice_roller.hpp"
 
 /// @brief Options class to handle command line arguments and user input for D&D attack calculations.
 class Options {
@@ -32,29 +17,9 @@ public:
     /// @brief Sets the values of the options manually.
     void set_manual();
 
-    /// @brief Accessor for the attack modifier.
-    /// @return Attack modifier value.
-    int attack_modifier() const { return _modifier; }
-
-    /// @brief Accessor for the attack count.
-    /// @return Attack count value.
-    int attack_count() const { return _attack_count; }
-
-    /// @brief Accessor for the damages vector.
-    /// @return Damages vector containing all damage types and values.
-    const std::vector<Damage> &damages() const { return _damages; }
-
-    /// @brief Accessor for the critical range.
-    /// @return Critical range value.
-    int crit_range() const { return _crit_range; }
-
-    /// @brief Accessor for the armor class (AC).
-    /// @return Armor class value.
-    int ac() const { return _ac; }
-
-    /// @brief Accessor for the attack type.
-    /// @return Attack type enum value.
-    AttackType attack_type() const { return _attack_type; }
+    /// @brief Accessor for the roll values.
+    /// @return RollVals struct containing the values for rolling dice.
+    RollVals &vals() { return _vals; }
 
     /// @brief Accessor for the only files flag.
     /// @return Only files flag value.
@@ -93,16 +58,16 @@ private:
     /// @brief Sets the attack type value through user input.
     void set_attack_type();
 
-    int _modifier{};
-    int _attack_count{};
-    int _crit_range{ 20 };
-    int _ac{};
-    std::vector<Damage> _damages{};
-    AttackType _attack_type{ NORMAL };
+    /// @brief Struct to hold the values for rolling dice.
+    RollVals _vals{};
+    /// @brief help flag
     bool _help{};
+    /// @brief Vector to hold file names
     std::vector<std::string> _opts_files{};
 
+    /// @brief Flag to indicate if only files should be processed
     bool _only_files{};
+    /// @brief Regex for parsing damage strings
     std::regex _damage_regex{ R"((\d+)d(\d+)(?:\s*([+-]\s*\d+))?\s*([a-zA-Z]+))" };
 };
 

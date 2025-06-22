@@ -11,29 +11,11 @@ DiceRoller::DiceRoller() {
     std::srand(static_cast<uint>(time(0)));
 }
 
-void DiceRoller::roll(const Options &options) {
-    // Initialize the RollVals struct with values from options
-    _vals = RollVals{};
-    _vals.ac = options.ac();
-    _vals.attack_num = options.attack_count();
-    _vals.modifier = options.attack_modifier();
-    _vals.attack_type = options.attack_type();
-    _vals.crit_range = options.crit_range();
-    _vals.damages = options.damages();
-    // Check if the values are valid before rolling
-    if (check_values()) {
-        roll();
-    }
-    else {
-        std::cerr << "Invalid values provided in options." << std::endl;
-        exit(EXIT_FAILURE);
-    }
-}
-
 void DiceRoller::roll() const {
     std::map<std::string, int> total{};
-
-    for (int i = 0; i < _vals.attack_num; i++) {
+    // Start rolling attacks based on the values set in _vals
+    for (int i = 0; i < _vals.attack_count; i++) {
+        // Roll attack roll based on the attack type
         int roll = 0;
         if (_vals.attack_type == NORMAL) {
             roll = rand(D20);
@@ -51,23 +33,23 @@ void DiceRoller::roll() const {
                 multiplier = 2;
             }
             for (size_t j = 0; j < _vals.damages.size(); j++) {
-                Damage current = _vals.damages.at(j);
-                int attack_damage = (damage(current.dice_count, current.dice_sides) * multiplier) + current.modifier;
+                Damage current_damage = _vals.damages.at(j);
+                int attack_damage = (damage(current_damage.dice_count, current_damage.dice_sides) * multiplier) + current_damage.modifier;
 
-                if (total.contains(current.type)) {
-                    total[current.type] += attack_damage;
+                if (total.contains(current_damage.type)) {
+                    total[current_damage.type] += attack_damage;
                 }
                 else {
-                    total.insert({ current.type, attack_damage });
+                    total.insert({ current_damage.type, attack_damage });
                 }
 
-                std::cout << attack_damage << " " << current.type;
+                std::cout << attack_damage << " " << current_damage.type;
                 if (j < _vals.damages.size() - 1) {
                     std::cout << " + ";
                 }
             }
             std::cout << " Damage";
-            if (multiplier == 2) {
+            if (multiplier == CRIT_MULTIPLIER) {
                 std::cout << " (Critical Hit)";
             }
             std::cout << std::endl;
@@ -164,6 +146,9 @@ void DiceRoller::set_ac(){
         try {
             _vals.ac = std::stoi(input);
             break;
+            if (_vals.ac < 1) {
+                throw std::invalid_argument(input);
+            }
         }
         catch (const std::invalid_argument &) {
             std::cout << "Invalid input. Please enter a AC: ";
@@ -190,6 +175,7 @@ void DiceRoller::get_values(const std::string &buf) {
     if (buf.empty()) {
         throw std::invalid_argument("Empty line got into get_values, binary is corrupted.");
     }
+    // Check if the line starts with "ac:" and parse the AC value
     else if (buf.starts_with("ac:")) {
         std::string ac = buf.substr(3);
         try {
@@ -202,11 +188,12 @@ void DiceRoller::get_values(const std::string &buf) {
             throw std::invalid_argument("Invalid AC value: " + ac + "\n");
         }
     }
+    // Check if the line starts with "attacks:" and parse the attack count value
     else if (buf.starts_with("attacks:")) {
         std::string attacks = buf.substr(8);
         try {
-            _vals.attack_num = std::stoi(attacks);
-            if(_vals.attack_num < 1){
+            _vals.attack_count = std::stoi(attacks);
+            if(_vals.attack_count < 1){
                 throw std::invalid_argument(attacks);
             }
         }
@@ -214,6 +201,7 @@ void DiceRoller::get_values(const std::string &buf) {
             throw std::invalid_argument("Invalid attacks value: " + attacks + "\n");
         }
     }
+    // Check if the line starts with "crit range:" and parse the critical range value
     else if (buf.starts_with("crit range:")) {
         std::string crit_range = buf.substr(11);
         try {
@@ -226,6 +214,7 @@ void DiceRoller::get_values(const std::string &buf) {
             throw std::invalid_argument("Invalid crit range value: " + crit_range + "\n");
         }
     }
+    // Check if the line starts with "modifier:" and parse the modifier value
     else if (buf.starts_with("modifier:")) {
         std::string modifier = buf.substr(9);
         try {
@@ -235,6 +224,7 @@ void DiceRoller::get_values(const std::string &buf) {
             throw std::invalid_argument("Invalid modifier value: " + modifier + "\n");
         }
     }
+    // Check if the line starts with "attack type:" and parse the attack type value
     else if (buf.starts_with("attack type:")) {
         std::string attack_type = buf.substr(12);
         if (attack_type == "a" || attack_type == "A") {
@@ -250,6 +240,7 @@ void DiceRoller::get_values(const std::string &buf) {
             throw std::invalid_argument("Invalid attack type value: " + attack_type + "\n");
         }
     }
+    // Check if the line starts with "damage:" and parse the damage values
     else if (buf.starts_with("damage:")) {
         std::string damage_str = buf.substr(7);
         auto begin = std::sregex_iterator(damage_str.begin(), damage_str.end(), _damage_regex);
@@ -270,6 +261,7 @@ void DiceRoller::get_values(const std::string &buf) {
             _vals.damages.push_back(damage);
         }
     }
+    // If the line does not match any of the expected formats, throw an error
     else {
         throw std::invalid_argument("Invalid line in file: " + buf + "\n");
     }
@@ -277,7 +269,7 @@ void DiceRoller::get_values(const std::string &buf) {
 
 bool DiceRoller::check_values() const {
     // Checks if the values in _vals are valid
-    if (_vals.attack_num == 0 || _vals.damages.empty()) {
+    if (_vals.attack_count == 0 || _vals.damages.empty()) {
         return false;
     }
     return true;
