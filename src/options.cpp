@@ -134,7 +134,6 @@ void Options::parse(int argc, char **argv) {
             if (std::filesystem::exists(arg)) {
                 _opts_files.push_back(arg);
             }
-            // If the argument is not a valid file, throw an error
             else {
                 throw std::invalid_argument("File does not exist: " + arg + ".");
             }
@@ -145,7 +144,7 @@ void Options::parse(int argc, char **argv) {
 }
 
 void Options::check_opts() {
-    // If no files were passed, check if the required options are set
+    // Check if the required options are set
     // _modifier can be 0, so is not checked here
     if (_opts_files.size() == 0 && !_help) {
         if (_vals.attack_count == 0) throw std::invalid_argument("attack-count wasn\'t passed, can\'t roll attack(s).");

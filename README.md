@@ -19,11 +19,21 @@ Then, CMake and make need to be run.
 cmake ..
 make
 ```
+When cross compiling from linux to windows, use the following commands:
+```
+cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/mingw-toolchain.cmake ..
+make
+```
 
 At this point, the program can be run.
 ```
 ./DndDiceRoller
 ```
+Or on Windows
+```
+./bundle/DndDiceRoller.exe
+```
+
 
 ## Current Limitations
 

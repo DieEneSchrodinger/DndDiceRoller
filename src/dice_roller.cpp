@@ -7,7 +7,7 @@
 #include "dice_roller.hpp"
 
 DiceRoller::DiceRoller() {
-    std::srand(static_cast<uint>(time(0)));
+    std::srand(static_cast<unsigned int>(time(0)));
 }
 
 void DiceRoller::roll() const {
@@ -176,12 +176,8 @@ int DiceRoller::rand(int dice_sides) const {
 }
 
 void DiceRoller::get_values(const std::string &buf) {
-    // Parses the values from the string buffer and sets them in _vals
-    if (buf.empty()) {
-        throw std::invalid_argument("Empty line got into get_values, binary is corrupted.");
-    }
     // Check if the line starts with "ac:" and parse the AC value
-    else if (buf.starts_with("ac:")) {
+    if (buf.starts_with("ac:")) {
         std::string ac = buf.substr(3);
         try {
             _vals.ac = std::stoi(ac);
