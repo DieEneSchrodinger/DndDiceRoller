@@ -5,15 +5,15 @@ function(compile_options SOURCE_NAME)
     if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
         target_compile_options(${SOURCE_NAME} PRIVATE /W4 /permissive- /WX)
         target_compile_options(${SOURCE_NAME} PRIVATE
-            $<$<CONFIG:Debug>:/Od /Zi /Ob0 /RTC1>
-            $<$<CONFIG:Release>:/O2 /DNDEBUG>)
+            $<$<CONFIG:Debug>: /Od /Zi /Ob0 /RTC1>
+            $<$<CONFIG:Release>: /O2 /DNDEBUG>)
     elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR 
             CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR 
             CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
         target_compile_options(${SOURCE_NAME} PRIVATE -Wall -Wextra -Werror -Wconversion -pedantic)
         target_compile_options(${SOURCE_NAME} PRIVATE
-            $<$<CONFIG:Debug>:-O0 -g -ggdb3 -fno-omit-frame-pointer>
-            $<$<CONFIG:Release>:-O2 -DNDEBUG>)
+            $<$<CONFIG:Debug>: -O0 -g -ggdb3 -fno-omit-frame-pointer>
+            $<$<CONFIG:Release>: -O2 -DNDEBUG>)
     else()
         message (FATAL_ERROR "This project cannot be compiled with the compiler ${CMAKE_CXX_COMPILER_ID}.")
     endif()
@@ -60,9 +60,11 @@ if (WIN32 OR CMAKE_SYSTEM_NAME STREQUAL "Windows")
                 "${BUNDLE_DIR}/${EXEC_NAME}.exe")
 
     # Strip the executable
-    execute_process(COMMAND ${MINGW_STRIP} -s ${EXE_PATH}
-                    RESULT_VARIABLE STRIP_RESULT
-                    OUTPUT_QUIET)
+    if(EXISTS ${MINGW_STRIP})
+        execute_process(COMMAND ${MINGW_STRIP} -s ${EXE_PATH}
+                        RESULT_VARIABLE STRIP_RESULT
+                        OUTPUT_QUIET)
+    endif()
 
     # Copy the dlls to the bundle directory
     file(GLOB DLL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/dlls/*.dll")
